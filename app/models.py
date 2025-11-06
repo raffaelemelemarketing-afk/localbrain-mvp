@@ -14,6 +14,7 @@ class Item(Base):
     city: Mapped[str] = mapped_column(String(100), default="Fiumicino")
     published_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     score: Mapped[float] = mapped_column(Float, default=0.0)
+    image_url: Mapped[str] = mapped_column(String(500), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
 class Ad(Base):

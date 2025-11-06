@@ -11,11 +11,53 @@ async def fetch_rss(url: str) -> List[Dict]:
     feed = feedparser.parse(url)
     items = []
     for e in feed.entries[:50]:
+        # Extract image URL from RSS entry
+        image_url = ""
+
+        # Try media:content
+        if hasattr(e, 'media_content') and e.media_content:
+            for media in e.media_content:
+                if hasattr(media, 'url') and media.get('type', '').startswith('image/'):
+                    image_url = media.url
+                    break
+
+        # Try enclosure
+        if not image_url and hasattr(e, 'enclosures'):
+            for enc in e.enclosures:
+                if enc.get('type', '').startswith('image/'):
+                    image_url = enc.get('href', '')
+                    break
+
+        # Try media:thumbnail
+        if not image_url and hasattr(e, 'media_thumbnail') and e.media_thumbnail:
+            for thumb in e.media_thumbnail:
+                if hasattr(thumb, 'url'):
+                    image_url = thumb.url
+                    break
+
+        # Try content with images
+        if not image_url and hasattr(e, 'content'):
+            for content in e.content:
+                if hasattr(content, 'value'):
+                    soup = BeautifulSoup(content.value, 'html.parser')
+                    img = soup.find('img')
+                    if img and img.get('src'):
+                        image_url = img['src']
+                        break
+
+        # Try summary with images
+        if not image_url and hasattr(e, 'summary'):
+            soup = BeautifulSoup(e.summary, 'html.parser')
+            img = soup.find('img')
+            if img and img.get('src'):
+                image_url = img['src']
+
         items.append({
             "title": getattr(e, "title", ""),
             "url": getattr(e, "link", ""),
             "summary": getattr(e, "summary", ""),
             "published_at": getattr(e, "published_parsed", None),
+            "image_url": image_url,
         })
     return items
 
@@ -125,8 +167,16 @@ async def fetch_html_list(url: str, rules: dict) -> List[Dict]:
                         break
         if not include:
             continue
+        # Extract image from HTML node
+        image_url = ""
+        image_selector = rules.get("image_selector")
+        if image_selector:
+            img_node = node.select_one(image_selector)
+            if img_node and img_node.get("src"):
+                image_url = str(base_url.join(img_node["src"]))
+
         if title and href:
-            items.append({"title": title, "url": href, "summary": summary, "location": location})
+            items.append({"title": title, "url": href, "summary": summary, "location": location, "image_url": image_url})
     if items:
         return items
 

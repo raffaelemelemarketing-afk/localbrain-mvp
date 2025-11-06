@@ -49,7 +49,8 @@ async def ingest():
                     category=cls["category"],
                     city=city,
                     published_at=datetime.utcnow(),
-                    score=cls["score"]
+                    score=cls["score"],
+                    image_url=it.get("image_url", "")
                 )
                 db.add(row)
             db.commit()
@@ -84,7 +85,8 @@ async def ingest():
                     category=cls["category"],
                     city=rule.get("city", CITY_DEFAULT),
                     published_at=datetime.utcnow(),
-                    score=cls["score"]
+                    score=cls["score"],
+                    image_url=it.get("image_url", "")
                 )
                 db.add(row)
             db.commit()
