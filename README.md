@@ -90,12 +90,38 @@ Modifica `app/sources/rss_list.json` e `app/sources/html_rules.json` per aggiung
 - `contact_name`, `contact_method`, `rate`, `available_from`, `available_to`
 - `status` (`pending`, `published`, `archived`, `rejected`), `highlighted`
 
+## Nuove Funzionalità (Novembre 2025)
+
+### Estrazione Immagini da RSS
+- Estrae automaticamente immagini da feed RSS da 5 fonti diverse:
+  - `media_content` (tag media:content)
+  - `enclosures` (allegati RSS)
+  - `media_thumbnail` (thumbnail immagini)
+  - `content` (contenuto HTML con immagini)
+  - `summary` (riassunto con immagini)
+- Immagini salvate come URL (hotlinking) senza occupare spazio locale
+- Visualizzazione immagini nella dashboard con stile responsivo
+
+### Documentazione Legale e GDPR
+- Privacy Policy, Terms & Conditions, Disclaimer, About Us
+- Cookie banner GDPR compliant
+- Checkbox accettazione privacy in tutti i moduli
+- Footer con link legali su tutte le pagine
+
+### Git Repository
+- Repository GitHub privato configurato
+- Deployment automatizzato via SCP
+- Gestione versioni del codice
+
 ## Roadmap breve
-- [ ] Scheduler (cron) per ingest automatico
+- [x] Scheduler (APScheduler) per ingest automatico ogni ora
+- [x] Estrazione immagini da RSS feeds (media_content, enclosures, media_thumbnail, content, summary)
+- [x] Visualizzazione immagini articoli nella dashboard
 - [ ] Filtri/alert per categoria
 - [x] Pannello admin upload ads
 - [ ] Metriche click-through / analytics
-- [ ] Export canale Telegram “broadcast” locale
+- [ ] Export canale Telegram "broadcast" locale
+- [ ] Funzionalità di ricerca nel feed
 
 ---
 **Brand:** ainextstudio.it — Pilot: Fiumicino
