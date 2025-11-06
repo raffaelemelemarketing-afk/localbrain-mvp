@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalBrain · Admin - Richieste Pubblicità</title>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6f8; margin: 0; }
+    header { background: #1c3faa; color: #fff; padding: 1.2rem 2rem 1.6rem; }
+    .topbar { display:flex; flex-wrap:wrap; align-items:center; gap:1.2rem; }
+    .topbar h1 { margin:0; font-size:1.85rem; flex:1 1 auto; }
+    nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    nav a { color:#fff; font-weight:600; text-decoration:none; padding:0.45rem 0.8rem; border-radius:999px; background:rgba(255,255,255,0.16); }
+    nav a:hover { background:rgba(255,255,255,0.28); }
+    main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; }
+    .stat-number { font-size: 2rem; font-weight: bold; color: #1c3faa; margin-bottom: 0.5rem; }
+    .stat-label { color: #6b7280; font-size: 0.9rem; }
+    .requests-table { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f8fafc; font-weight: 600; color: #374151; }
+    tr:hover { background: #f9fafb; }
+    .status-badge { padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-contacted { background: #dbeafe; color: #1e40af; }
+    .status-approved { background: #d1fae5; color: #065f46; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+    .actions { display: flex; gap: 0.5rem; }
+    .btn { padding: 0.4rem 0.8rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; text-decoration: none; }
+    .btn-primary { background: #1c3faa; color: white; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn:hover { opacity: 0.9; }
+    .global-footer { background:#1c3faa; color:#f8fafc; padding:1.4rem 2rem; margin-top:3rem; }
+    .global-footer .footer-inner { max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between; font-size:0.9rem; }
+    .global-footer nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    .global-footer nav a { color:#ffffff; text-decoration:none; font-weight:600; background:rgba(255,255,255,0.18); padding:0.4rem 0.75rem; border-radius:999px; }
+    .global-footer nav a:hover { background:rgba(255,255,255,0.28); }
+    .message-preview { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #6b7280; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <h1>Admin - Richieste Pubblicità</h1>
+      <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/admin/ads">Gestisci Ads</a>
+        <a href="/admin/offers">Gestisci Annunci</a>
+        <a href="/admin/businesses">Gestisci Attività</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-number">{{ pending_count }}</div>
+        <div class="stat-label">Richieste in attesa</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ ad_requests|length }}</div>
+        <div class="stat-label">Totale richieste</div>
+      </div>
+    </div>
+
+    <div class="requests-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Attività</th>
+            <th>Referente</th>
+            <th>Contatti</th>
+            <th>Tipo</th>
+            <th>Messaggio</th>
+            <th>Stato</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in ad_requests %}
+          <tr>
+            <td>{{ req.created_at }}</td>
+            <td><strong>{{ req.business_name }}</strong></td>
+            <td>{{ req.contact_person }}</td>
+            <td>
+              <div>{{ req.email }}</div>
+              {% if req.phone %}<div style="font-size:0.8rem; color:#6b7280;">{{ req.phone }}</div>{% endif %}
+            </td>
+            <td>{{ req.ad_type_label }}</td>
+            <td class="message-preview" title="{{ req.message }}">{{ req.message or "-" }}</td>
+            <td>
+              <span class="status-badge status-{{ req.status }}">{{ req.status_label }}</span>
+            </td>
+            <td class="actions">
+              <form method="post" action="/ad-requests/{{ req.id }}/status" style="display: inline;">
+                <select name="new_status" onchange="this.form.submit()" style="padding:0.3rem; border-radius:4px; border:1px solid #d1d5db; font-size:0.8rem;">
+                  {% for status in status_options %}
+                  <option value="{{ status }}" {% if req.status == status %}selected{% endif %}>{{ status_labels[status] }}</option>
+                  {% endfor %}
+                </select>
+                {% if requires_token %}
+                <input type="hidden" name="admin_token" value="{{ admin_token }}">
+                {% endif %}
+              </form>
+              <form method="post" action="/ad-requests/{{ req.id }}" style="display: inline;">
+                <input type="hidden" name="_method" value="DELETE">
+                {% if requires_token %}
+                <input type="hidden" name="admin_token" value="{{ admin_token }}">
+                {% endif %}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questa richiesta?')">Elimina</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 2rem; color: #6b7280;">
+              Nessuna richiesta di pubblicità trovata.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="global-footer">
+    <div class="footer-inner">
+      <span>© 2025 LocalBrain Fiumicino. Tutti i diritti riservati.</span>
+      <nav>
+        <a href="/businesses/new">Aggiungi attività</a>
+        <a href="/offers/new">Pubblica annuncio</a>
+        <a href="/ad-request">Richiedi pubblicità</a>
+        <a href="https://t.me/localbrain_fiumicino_bot" target="_blank" rel="noopener noreferrer">Iscriviti al canale Telegram</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    // Supporto per DELETE method in forms
+    document.addEventListener('DOMContentLoaded', function() {
+      const deleteForms = document.querySelectorAll('form[action*="/ad-requests/"]');
+      deleteForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+          if (this.querySelector('input[name="_method"]')?.value === 'DELETE') {
+            e.preventDefault();
+            fetch(this.action, {
+              method: 'DELETE',
+              headers: {
+                'X-Admin-Token': this.querySelector('input[name="admin_token"]')?.value || ''
+              }
+            }).then(response => {
+              if (response.ok) {
+                location.reload();
+              }
+            });
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

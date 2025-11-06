@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalBrain · Ads Admin</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f5fa;
+      color: #111827;
+    }
+    body { margin: 0; padding: 0 0 3rem; background: #f3f5fa; }
+    header { background: #1f3ad7; color: #fff; padding: 1.5rem 2rem; }
+    header h1 { margin: 0; font-size: 1.8rem; }
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; }
+    section { background: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 20px 35px -28px rgba(31,58,215,0.45); }
+    h2 { margin: 0 0 1rem; font-size: 1.2rem; }
+    label { display: block; margin-bottom: .6rem; font-weight: 600; color: #1f2937; }
+    input, select, textarea { width: 100%; padding: .6rem .75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: .95rem; margin-bottom: 1rem; box-sizing: border-box; background: #fff; }
+    textarea { min-height: 90px; resize: vertical; }
+    button { border: none; border-radius: 8px; padding: .65rem 1.2rem; font-weight: 600; cursor: pointer; }
+    button.primary { background: #1f3ad7; color: #fff; }
+    button.outline { background: transparent; color: #1f3ad7; border: 1px solid #1f3ad7; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: .75rem .6rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: .95rem; }
+    th { background: #f9fafb; font-weight: 600; color: #1f2937; }
+    tr.inactive td { opacity: .55; }
+    .actions button { margin-right: .4rem; }
+    .badge { display: inline-flex; align-items: center; padding: .2rem .55rem; background: #eef2ff; color: #312e81; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+    #status { margin-bottom: 1rem; font-size: .95rem; }
+    @media (max-width: 720px) {
+      main { padding: 1rem; }
+      header { padding: 1.2rem 1.4rem; }
+      th:nth-child(5), td:nth-child(5) { display: none; }
+      th:nth-child(6), td:nth-child(6) { display: none; }
+    }
+    .global-footer { background:#1c3faa; color:#f8fafc; padding:1.4rem 2rem; margin-top:3rem; }
+    .global-footer .footer-inner { max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between; font-size:0.9rem; }
+    .global-footer nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    .global-footer nav a { color:#ffffff; text-decoration:none; font-weight:600; background:rgba(255,255,255,0.18); padding:0.4rem 0.75rem; border-radius:999px; }
+    .global-footer nav a:hover { background:rgba(255,255,255,0.28); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LocalBrain · Gestione Ads</h1>
+    <p style="margin:.3rem 0 0;">Crea, attiva e rimuovi gli sponsor che appaiono nelle liste e nel bot.</p>
+  </header>
+  <main>
+    <section id="tokenSection">
+      <h2>Token amministratore</h2>
+      <p>Il token verrà memorizzato nel tuo browser per le chiamate successive.</p>
+      <label for="adminToken">X-Admin-Token</label>
+      <input id="adminToken" type="text" placeholder="Inserisci il token admin">
+      <button class="primary" id="saveToken">Salva token</button>
+    </section>
+
+    <section>
+      <h2>Nuovo annuncio</h2>
+      <div id="status"></div>
+      <form id="adForm">
+        <label for="title">Titolo</label>
+        <input id="title" name="title" required placeholder="Es. Pizzeria La Palma">
+
+        <label for="url">URL destinazione</label>
+        <input id="url" name="url" required placeholder="https://...">
+
+        <label for="message">Messaggio breve</label>
+        <textarea id="message" name="message" placeholder="Messaggio promozionale"></textarea>
+
+        <label for="image_url">URL immagine (facoltativo)</label>
+        <input id="image_url" name="image_url" placeholder="https://.../banner.jpg">
+
+        <label for="category">Categoria (facoltativo)</label>
+        <input id="category" name="category" placeholder="all, lavoro, eventi...">
+
+        <label for="city">Città (facoltativo)</label>
+        <input id="city" name="city" placeholder="all o nome città">
+
+        <label for="weight">Weight</label>
+        <input id="weight" name="weight" type="number" step="0.1" value="1.0">
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="show_in_feed" value="true" checked>
+          Mostra nel feed
+        </label>
+
+        <label for="sidebar_slot">Posizione sidebar</label>
+        <select id="sidebar_slot" name="sidebar_slot">
+          <option value="">Nessuna (auto)</option>
+          <option value="left">Solo sinistra</option>
+          <option value="right">Solo destra</option>
+        </select>
+
+        <label for="active">Attivo</label>
+        <select id="active" name="active">
+          <option value="true" selected>Sì</option>
+          <option value="false">No</option>
+        </select>
+
+        <button type="submit" class="primary">Crea annuncio</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Annunci attivi</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Titolo</th>
+            <th>Messaggio</th>
+            <th>Categoria</th>
+            <th>Città</th>
+            <th>Weight</th>
+            <th>Feed</th>
+            <th>Sidebar</th>
+            <th>Immagine</th>
+            <th>Creato</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="adsTable"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const tableBody = document.getElementById('adsTable');
+    const form = document.getElementById('adForm');
+    const tokenInput = document.getElementById('adminToken');
+    const tokenSection = document.getElementById('tokenSection');
+    const showInFeedInput = document.getElementById('show_in_feed');
+    const requiresToken = {{ 'true' if requires_token else 'false' }};
+    let adminToken = "";
+
+    if (requiresToken) {
+      const fromTemplate = "{{ admin_token }}".trim();
+      if (fromTemplate && fromTemplate !== "{{ admin_token }}") {
+        adminToken = fromTemplate;
+      } else {
+        adminToken = localStorage.getItem('localbrain_admin_token') || "";
+      }
+      tokenInput.value = adminToken;
+
+      document.getElementById('saveToken').addEventListener('click', () => {
+        const token = tokenInput.value.trim();
+        if (!token) {
+          alert("Inserisci un token valido");
+          return;
+        }
+        adminToken = token;
+        localStorage.setItem('localbrain_admin_token', token);
+        statusEl.textContent = "Token salvato. Ricarica/crea per applicarlo.";
+      });
+    } else {
+      tokenSection.style.display = "none";
+    }
+
+    async function fetchAds() {
+      tableBody.innerHTML = "<tr><td colspan='7'>Caricamento...</td></tr>";
+      try {
+        const res = await fetch("/ads");
+        if (!res.ok) throw new Error("Errore nel recupero ads");
+        const data = await res.json();
+        if (!data.length) {
+          tableBody.innerHTML = "<tr><td colspan='7'>Nessun annuncio inserito</td></tr>";
+          return;
+        }
+        tableBody.innerHTML = "";
+        data.forEach(ad => {
+          const tr = document.createElement('tr');
+          if (!ad.active) tr.classList.add('inactive');
+          tr.innerHTML = `
+            <td>${escapeHtml(ad.title)}</td>
+            <td>${escapeHtml(ad.message || "")}</td>
+            <td><span class="badge">${escapeHtml(ad.category || "all")}</span></td>
+            <td>${escapeHtml(ad.city || "all")}</td>
+            <td>${ad.weight ?? ""}</td>
+            <td>${ad.show_in_feed ? "Sì" : "No"}</td>
+            <td>${escapeHtml(ad.sidebar_slot || "auto")}</td>
+            <td>${ad.image_url ? `<a href=\"${escapeHtml(ad.image_url)}\" target=\"_blank\">link</a>` : ""}</td>
+            <td>${ad.created_at ? new Date(ad.created_at).toLocaleString() : ""}</td>
+            <td class="actions">
+              <button class="outline" data-id="${ad.id}" data-action="delete">Elimina</button>
+            </td>
+          `;
+          tableBody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error(err);
+        tableBody.innerHTML = "<tr><td colspan='7'>Errore nel caricamento</td></tr>";
+      }
+    }
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const formData = new FormData(form);
+      const params = new URLSearchParams();
+      for (const [key, value] of formData.entries()) {
+        if (value !== "") params.append(key, value);
+      }
+      params.append("show_in_feed", showInFeedInput.checked ? "true" : "false");
+      try {
+        const res = await fetch(`/ads?${params.toString()}`, {
+          method: "POST"
+        });
+        if (!res.ok) {
+          const error = await res.json().catch(() => ({}));
+          throw new Error(error.detail || "Errore nella creazione");
+        }
+        statusEl.textContent = "Annuncio creato correttamente.";
+        form.reset();
+        await fetchAds();
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Errore: " + err.message;
+      }
+    });
+
+    tableBody.addEventListener('click', async (ev) => {
+      const btn = ev.target.closest('button[data-action="delete"]');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      if (!confirm("Vuoi eliminare questo annuncio?")) return;
+      try {
+        const res = await fetch(`/ads/${id}`, {
+          method: "DELETE"
+        });
+        if (!res.ok) {
+          const error = await res.json().catch(() => ({}));
+          throw new Error(error.detail || "Errore nell'eliminazione");
+        }
+        await fetchAds();
+      } catch (err) {
+        console.error(err);
+        alert("Errore: " + err.message);
+      }
+    });
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    fetchAds();
+  </script>
+  <footer class="global-footer">
+    <div class="footer-inner">
+      <span>© 2025 LocalBrain Fiumicino. Tutti i diritti riservati.</span>
+      <nav>
+        <a href="/businesses/new">Aggiungi attività</a>
+        <a href="/offers/new">Pubblica annuncio</a>
+        <a href="https://t.me/localbrain_fiumicino_bot" target="_blank" rel="noopener noreferrer">Iscriviti al canale Telegram</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

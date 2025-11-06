@@ -1,0 +1,73 @@
+[
+  {
+    "name": "Subito – Lavoro a Fiumicino",
+    "url": "https://www.subito.it/annunci-lazio/vendita/offerte-lavoro/roma/fiumicino/",
+    "item_selector": "div.items__item, div.item-card",
+    "title_selector": "h2.items__title, h2[itemprop='name'], a[itemprop='url']",
+    "url_selector": "a::attr(href)",
+    "summary_selector": "p.items__description, p[itemprop='description']",
+    "city": "Fiumicino"
+  },
+  {
+    "name": "Manpower – Offerte Fiumicino",
+    "url": "https://www.manpower.it/it/trova-lavoro/citta/fiumicino",
+    "item_selector": "section#main-content article, li.search-result, div.job-card",
+    "title_selector": "h2 a, a.job-title",
+    "url_selector": "h2 a::attr(href), a.job-title::attr(href)",
+    "summary_selector": "p, .job-card__description",
+    "json_title_key": "jobTitle",
+    "json_url_key": "jobURL",
+    "json_summary_key": "publicDescription",
+    "json_filter_key": "jobLocation",
+    "json_filter_value": "Fiumicino",
+    "city": "Fiumicino"
+  },
+  {
+    "name": "Porta Futuro Lazio – Offerte",
+    "url": "https://portafuturolazio.it/cittadini/offerte-di-lavoro/",
+    "item_selector": "article, .card, li",
+    "title_selector": "h2 a, h3 a, .card-title a",
+    "url_selector": "a::attr(href)",
+    "summary_selector": ".entry-summary, .card-text, p",
+    "json_title_key": "denominazione",
+    "json_url_key": "linkEsterno",
+    "json_summary_key": "descrizione",
+    "json_filter_key": "localita",
+    "json_filter_value": "Fiumicino",
+    "city": "Lazio"
+  },
+  {
+    "name": "Città Metropolitana di Roma – Notizie",
+    "url": "https://www.cittametropolitanaroma.it/homepage/media-e-comunicazione/notizie/",
+    "item_selector": ".td_module_wrap",
+    "title_selector": "h3 a",
+    "url_selector": "h3 a::attr(href)",
+    "summary_selector": ".td-excerpt",
+    "city": "Roma"
+  },
+  {
+    "name": "RomaToday – Eventi Fiumicino",
+    "url": "https://www.romatoday.it/eventi/?output=amp",
+    "item_selector": "article.c-card",
+    "title_selector": ".c-card__heading",
+    "url_selector": "a::attr(href)",
+    "summary_selector": ".c-card__heading + p, .c-card__summary, .c-card__excerpt",
+    "location_selector": "li.c-card__item-details a span",
+    "city": "Fiumicino",
+    "filters": [
+      {
+        "field": "location",
+        "contains": "Fiumicino"
+      }
+    ]
+  },
+  {
+    "name": "CanaleDieci – Notizie Fiumicino",
+    "url": "https://canaledieci.it/news/fiumicino/",
+    "item_selector": ".td_module_wrap",
+    "title_selector": ".td-module-title a",
+    "url_selector": ".td-module-title a::attr(href)",
+    "summary_selector": ".td-excerpt",
+    "city": "Fiumicino"
+  }
+]

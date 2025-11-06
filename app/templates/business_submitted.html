@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attività inviata · LocalBrain</title>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6f8; margin: 0; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    header { position:absolute; top:0; left:0; right:0; background:#1c3faa; color:#fff; padding:1.2rem 2rem 1.4rem; }
+    .topbar { display:flex; flex-wrap:wrap; align-items:center; gap:1.2rem; }
+    .topbar h1 { margin:0; font-size:1.85rem; flex:1 1 auto; }
+    nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    nav a { color:#fff; font-weight:600; text-decoration:none; padding:0.45rem 0.8rem; border-radius:999px; background:rgba(255,255,255,0.16); }
+    nav a:hover { background:rgba(255,255,255,0.28); }
+    .card { background:#fff; border-radius:14px; padding:2.2rem 2.4rem; max-width:520px; box-shadow:0 30px 60px -40px rgba(28,63,170,0.7); text-align:center; margin-top:140px; }
+    h2 { margin:0 0 1rem; color:#111827; font-size:1.6rem; }
+    p { color:#475569; margin:0 0 1rem; line-height:1.6; }
+    a { color:#1c3faa; font-weight:600; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .global-footer { background:#1c3faa; color:#f8fafc; padding:1.4rem 2rem; margin-top:3rem; }
+    .global-footer .footer-inner { max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between; font-size:0.9rem; }
+    .global-footer nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    .global-footer nav a { color:#ffffff; text-decoration:none; font-weight:600; background:rgba(255,255,255,0.18); padding:0.4rem 0.75rem; border-radius:999px; }
+    .global-footer nav a:hover { background:rgba(255,255,255,0.28); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <h1>Grazie!</h1>
+      <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/offers">Bacheca servizi</a>
+        <a href="/businesses">Attività locali</a>
+      </nav>
+    </div>
+  </header>
+  <div class="card">
+    <h2>Attività ricevuta</h2>
+    <p>Abbiamo salvato la scheda <strong>{{ business.name }}</strong>. La pubblicheremo dopo una breve verifica editoriale.</p>
+    <p>Nel frattempo puoi tornare alla <a href="/businesses">lista attività</a> oppure al <a href="/dashboard">feed principale</a>.</p>
+  </div>
+  <footer class="global-footer">
+    <div class="footer-inner">
+      <span>© 2025 LocalBrain Fiumicino. Tutti i diritti riservati.</span>
+      <nav>
+        <a href="/businesses/new">Aggiungi attività</a>
+        <a href="/offers/new">Pubblica annuncio</a>
+        <a href="https://t.me/localbrain_fiumicino_bot" target="_blank" rel="noopener noreferrer">Iscriviti al canale Telegram</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalBrain · Richiesta inviata</title>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6f8; margin: 0; }
+    header { background: #1c3faa; color: #fff; padding: 1.2rem 2rem 1.6rem; }
+    .topbar { display:flex; flex-wrap:wrap; align-items:center; gap:1.2rem; }
+    .topbar h1 { margin:0; font-size:1.85rem; flex:1 1 auto; }
+    nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    nav a { color:#fff; font-weight:600; text-decoration:none; padding:0.45rem 0.8rem; border-radius:999px; background:rgba(255,255,255,0.16); }
+    nav a:hover { background:rgba(255,255,255,0.28); }
+    main { max-width: 720px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+    .success-card { background: #fff; padding: 2rem; border-radius: 14px; box-shadow: 0 16px 36px -32px rgba(28, 63, 170, 0.7); text-align: center; }
+    .success-icon { font-size: 4rem; color: #10b981; margin-bottom: 1rem; }
+    .success-card h2 { color: #1f2937; margin: 0 0 1rem 0; }
+    .success-card p { color: #6b7280; line-height: 1.6; margin: 0 0 1.5rem 0; }
+    .request-details { background: #f8fafc; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; text-align: left; }
+    .request-details h3 { margin: 0 0 1rem 0; color: #1f2937; }
+    .detail-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+    .detail-label { font-weight: 600; color: #374151; }
+    .detail-value { color: #6b7280; }
+    button { padding: 0.7rem 1rem; background: #1c3faa; border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+    button:hover { background: #162f7a; }
+    .global-footer { background:#1c3faa; color:#f8fafc; padding:1.4rem 2rem; margin-top:3rem; }
+    .global-footer .footer-inner { max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between; font-size:0.9rem; }
+    .global-footer nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    .global-footer nav a { color:#ffffff; text-decoration:none; font-weight:600; background:rgba(255,255,255,0.18); padding:0.4rem 0.75rem; border-radius:999px; }
+    .global-footer nav a:hover { background:rgba(255,255,255,0.28); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <h1>Richiesta inviata</h1>
+      <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/offers">Bacheca servizi</a>
+        <a href="/businesses">Attività locali</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="success-card">
+      <div class="success-icon">✅</div>
+      <h2>Richiesta ricevuta!</h2>
+      <p>La tua richiesta di pubblicità è stata inviata con successo. Ti contatteremo entro 24 ore per confermare i dettagli e attivare la pubblicità.</p>
+
+      <div class="request-details">
+        <h3>Dettagli della richiesta</h3>
+        <div class="detail-row">
+          <span class="detail-label">Attività:</span>
+          <span class="detail-value">{{ ad_request.business_name }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Referente:</span>
+          <span class="detail-value">{{ ad_request.contact_person }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Email:</span>
+          <span class="detail-value">{{ ad_request.email }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Tipo pubblicità:</span>
+          <span class="detail-value">
+            {% if ad_request.ad_type == "feed" %}Sponsor nel Feed
+            {% elif ad_request.ad_type == "sidebar" %}Banner Laterale
+            {% elif ad_request.ad_type == "both" %}Pacchetto Completo
+            {% else %}{{ ad_request.ad_type }}{% endif %}
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Data invio:</span>
+          <span class="detail-value">{{ ad_request.created_at }}</span>
+        </div>
+      </div>
+
+      <a href="/dashboard">
+        <button>Torna alla Dashboard</button>
+      </a>
+    </div>
+  </main>
+
+  <footer class="global-footer">
+    <div class="footer-inner">
+      <span>© 2025 LocalBrain Fiumicino. Tutti i diritti riservati.</span>
+      <nav>
+        <a href="/businesses/new">Aggiungi attività</a>
+        <a href="/offers/new">Pubblica annuncio</a>
+        <a href="/ad-request">Richiedi pubblicità</a>
+        <a href="https://t.me/localbrain_fiumicino_bot" target="_blank" rel="noopener noreferrer">Iscriviti al canale Telegram</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

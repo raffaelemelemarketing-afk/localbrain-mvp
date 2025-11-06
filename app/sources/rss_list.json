@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Comune di Fiumicino – Notizie",
+    "url": "https://www.comune.fiumicino.rm.it/it/news/feed",
+    "city": "Fiumicino"
+  },
+  {
+    "name": "Comune di Fiumicino – Eventi",
+    "url": "https://www.comune.fiumicino.rm.it/it/events/feed",
+    "city": "Fiumicino"
+  },
+  {
+    "name": "Regione Lazio – Giunta",
+    "url": "https://www.regione.lazio.it/rss-giunta-regionale",
+    "city": "Lazio"
+  },
+  {
+    "name": "Consiglio Regionale Lazio – Notizie",
+    "url": "https://www.consiglio.regione.lazio.it/consiglio-regionale/rss/rssConsiglio.xml",
+    "city": "Lazio"
+  },
+  {
+    "name": "Turismo Roma – Eventi e Notizie",
+    "url": "https://www.turismoroma.it/rss.xml",
+    "city": "Roma"
+  }
+]

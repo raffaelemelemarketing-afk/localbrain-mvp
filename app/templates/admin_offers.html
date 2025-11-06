@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalBrain · Admin Offerte</title>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#f4f6fb; margin:0; color:#111827; }
+    header { background:#111827; color:#fff; padding:1.4rem 2rem; }
+    header h1 { margin:0; font-size:1.6rem; }
+    header p { margin:.35rem 0 0; opacity:.85; }
+    main { max-width:1100px; margin:0 auto; padding:1.8rem 2rem 3rem; }
+    #tokenSection { margin-bottom:1.5rem; display:flex; gap:.7rem; align-items:flex-end; flex-wrap:wrap; }
+    #tokenSection input { width:260px; padding:.55rem .7rem; border:1px solid #cbd5f5; border-radius:6px; }
+    button { padding:.55rem 1rem; border-radius:6px; border:none; cursor:pointer; font-weight:600; }
+    button.primary { background:#2563eb; color:#fff; }
+    button.outline { background:transparent; color:#2563eb; border:1px solid #2563eb; }
+    table { width:100%; border-collapse:collapse; background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 22px 48px -32px rgba(30, 64, 175, 0.5); }
+    th, td { padding:.75rem .7rem; border-bottom:1px solid #e5e7eb; text-align:left; font-size:.95rem; vertical-align:top; }
+    th { background:#eef2ff; font-weight:600; color:#1f2937; }
+    tr:last-child td { border-bottom:none; }
+    .badge { display:inline-flex; padding:.25rem .6rem; border-radius:999px; font-size:.75rem; text-transform:uppercase; letter-spacing:.02em; }
+    .status-pending { background:#fef3c7; color:#92400e; }
+    .status-published { background:#dcfce7; color:#166534; }
+    .status-archived { background:#e5e7eb; color:#374151; }
+    .status-rejected { background:#fee2e2; color:#991b1b; }
+    .tag { display:inline-flex; padding:.2rem .55rem; background:#e0e7ff; color:#1e3a8a; border-radius:999px; font-size:.75rem; }
+    .actions { display:flex; flex-wrap:wrap; gap:.35rem; }
+    #status { margin-bottom:1rem; font-size:.95rem; color:#1d4ed8; }
+    .highlight-flag { display:inline-flex; align-items:center; gap:.4rem; font-size:.85rem; color:#4338ca; }
+    .empty { padding:1.2rem; text-align:center; color:#6b7280; background:#fff; border-radius:12px; }
+    .backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.55); display:none; align-items:center; justify-content:center; z-index:40; }
+    .backdrop.show { display:flex; }
+    .modal { background:#fff; width:min(560px, 95%); max-height:90vh; overflow:auto; border-radius:14px; padding:1.5rem; box-shadow:0 18px 45px -28px rgba(15,23,42,.65); }
+    .modal h2 { margin:0 0 1rem; font-size:1.25rem; }
+    .modal form { display:flex; flex-direction:column; gap:.85rem; }
+    .modal label { display:flex; flex-direction:column; gap:.45rem; font-size:.9rem; color:#1f2937; }
+    .modal input, .modal select, .modal textarea { padding:.55rem .7rem; border:1px solid #cbd5f5; border-radius:8px; font-size:.95rem; }
+    .modal textarea { min-height:110px; resize:vertical; }
+    .modal .row { display:flex; gap:.8rem; flex-wrap:wrap; }
+    .modal .row > label { flex:1 1 200px; }
+    .modal .actions { display:flex; justify-content:flex-end; gap:.6rem; margin-top:.6rem; }
+    .checkbox-inline { display:flex; align-items:center; gap:.45rem; font-size:.9rem; }
+    @media(max-width:780px){ table, thead, tbody, th, td, tr { display:block; } th { position:sticky; top:0; } tr { border-bottom:1px solid #e5e7eb; padding-bottom:1rem; } td { padding:.55rem 0; } .actions { flex-direction:row; flex-wrap:wrap; } }
+    .global-footer { background:#1c3faa; color:#f8fafc; padding:1.4rem 2rem; margin-top:3rem; }
+    .global-footer .footer-inner { max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between; font-size:0.9rem; }
+    .global-footer nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    .global-footer nav a { color:#ffffff; text-decoration:none; font-weight:600; background:rgba(255,255,255,0.18); padding:0.4rem 0.75rem; border-radius:999px; }
+    .global-footer nav a:hover { background:rgba(255,255,255,0.28); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gestione offerte lavoro/servizi</h1>
+    <p>Richieste in attesa: <strong id="pendingCount">{{ pending_count }}</strong></p>
+  </header>
+  <main>
+    <section id="tokenSection">
+      <div>
+        <label for="adminToken" style="display:block;font-weight:600;color:#1f2937">Token amministratore</label>
+        <input id="adminToken" type="text" placeholder="X-Admin-Token">
+      </div>
+      <button id="saveToken" class="outline">Salva token</button>
+      <div id="status"></div>
+    </section>
+    {% if offers %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Offerta</th>
+          <th>Categoria</th>
+          <th>Città / Zona</th>
+          <th>Contatto</th>
+          <th>Tariffa</th>
+          <th>Disponibilità</th>
+          <th>Stato</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for offer in offers %}
+        <tr data-id="{{ offer.id }}">
+          <td>#{{ offer.id }}</td>
+          <td>
+            <strong>{{ offer.title }}</strong><br>
+            <small>{{ offer.description[:120] }}{% if offer.description|length > 120 %}…{% endif %}</small>
+          </td>
+          <td><span class="tag">{{ offer.category_label }}</span></td>
+          <td>{{ offer.city }}{% if offer.zone %} · {{ offer.zone }}{% endif %}</td>
+          <td>{{ offer.contact_name }}<br>{{ offer.contact_method }}</td>
+          <td>{{ offer.rate }}</td>
+          <td>{{ offer.available_range }}</td>
+          <td>
+            <span class="badge status-{{ offer.status }}">{{ offer.status }}</span>
+            {% if offer.highlighted %}
+              <div class="highlight-flag">★ Evidenziato</div>
+            {% endif %}
+          </td>
+          <td>
+            <div class="actions">
+              <button class="outline" data-action="status" data-status="published" data-id="{{ offer.id }}">Pubblica</button>
+              <button class="outline" data-action="status" data-status="pending" data-id="{{ offer.id }}">Pending</button>
+              <button class="outline" data-action="status" data-status="archived" data-id="{{ offer.id }}">Archivia</button>
+              <button class="outline" data-action="status" data-status="rejected" data-id="{{ offer.id }}">Rifiuta</button>
+              <button class="primary" data-action="edit" data-payload='{{ offer | tojson }}'>Modifica</button>
+              <button class="outline" data-action="delete" data-id="{{ offer.id }}">Elimina</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="empty">Nessuna offerta registrata.</div>
+    {% endif %}
+  </main>
+
+  <div class="backdrop" id="offerBackdrop">
+    <div class="modal">
+      <h2>Modifica offerta</h2>
+      <form id="offerForm">
+        <input type="hidden" id="offerId">
+        <label>Titolo
+          <input name="title" id="offerTitle" required>
+        </label>
+        <label>Descrizione
+          <textarea name="description" id="offerDescription" required></textarea>
+        </label>
+        <div class="row">
+          <label>Categoria
+            <select name="category" id="offerCategory">
+              {% for value, label in categories %}
+                <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label>Stato
+            <select name="status_value" id="offerStatus">
+              {% for value in offer_statuses %}
+                <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label>Città
+            <input name="city" id="offerCity">
+          </label>
+          <label>Zona / Quartiere
+            <input name="zone" id="offerZone">
+          </label>
+        </div>
+        <div class="row">
+          <label>Referente
+            <input name="contact_name" id="offerContactName">
+          </label>
+          <label>Contatto
+            <input name="contact_method" id="offerContactMethod">
+          </label>
+        </div>
+        <div class="row">
+          <label>Tariffa indicativa
+            <input name="rate" id="offerRate">
+          </label>
+          <label>Disponibile dal
+            <input type="date" name="available_from" id="offerFrom">
+          </label>
+          <label>Disponibile fino al
+            <input type="date" name="available_to" id="offerTo">
+          </label>
+        </div>
+        <label class="checkbox-inline">
+          <input type="checkbox" name="highlighted" id="offerHighlight">
+          Evidenzia in home
+        </label>
+        <div class="actions">
+          <button type="button" id="cancelOfferEdit" class="outline">Annulla</button>
+          <button type="submit" class="primary">Salva modifiche</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const requiresToken = {{ 'true' if requires_token else 'false' }};
+    const tokenInput = document.getElementById('adminToken');
+    const tokenSection = document.getElementById('tokenSection');
+    const statusEl = document.getElementById('status');
+    const pendingCountEl = document.getElementById('pendingCount');
+    const backdrop = document.getElementById('offerBackdrop');
+    const offerForm = document.getElementById('offerForm');
+    const cancelBtn = document.getElementById('cancelOfferEdit');
+    const highlightInput = document.getElementById('offerHighlight');
+    const statusSelect = document.getElementById('offerStatus');
+    let currentId = null;
+
+    if (!requiresToken) {
+      tokenSection.style.display = 'none';
+    } else {
+      const stored = localStorage.getItem('localbrain_admin_token') || '{{ admin_token }}';
+      tokenInput.value = stored;
+      document.getElementById('saveToken').addEventListener('click', () => {
+        localStorage.setItem('localbrain_admin_token', tokenInput.value.trim());
+        statusEl.textContent = 'Token salvato';
+      });
+    }
+
+    function currentToken() {
+      return requiresToken ? (tokenInput.value.trim() || localStorage.getItem('localbrain_admin_token') || '') : '';
+    }
+
+    function openModal(data) {
+      currentId = data.id;
+      offerForm.reset();
+      document.getElementById('offerId').value = data.id;
+      document.getElementById('offerTitle').value = data.title || '';
+      document.getElementById('offerDescription').value = data.description || '';
+      document.getElementById('offerCategory').value = data.category || 'altro';
+      statusSelect.value = data.status || 'pending';
+      document.getElementById('offerCity').value = data.city || '';
+      document.getElementById('offerZone').value = data.zone || '';
+      document.getElementById('offerContactName').value = data.contact_name || '';
+      document.getElementById('offerContactMethod').value = data.contact_method || '';
+      document.getElementById('offerRate').value = data.rate || '';
+      document.getElementById('offerFrom').value = data.available_from || '';
+      document.getElementById('offerTo').value = data.available_to || '';
+      highlightInput.checked = !!data.highlighted;
+      backdrop.classList.add('show');
+    }
+
+    function closeModal() {
+      backdrop.classList.remove('show');
+      currentId = null;
+    }
+
+    document.querySelectorAll('button[data-action="edit"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const data = JSON.parse(btn.dataset.payload || '{}');
+        openModal(data);
+      });
+    });
+
+    document.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        if (!confirm('Eliminare questa offerta?')) return;
+        try {
+          const res = await fetch(`/offers/${id}`, {
+            method: 'DELETE',
+            headers: { ...(requiresToken ? { 'X-Admin-Token': currentToken() } : {}) }
+          });
+          if (!res.ok) {
+            const detail = await res.json().catch(() => ({}));
+            throw new Error(detail.detail || 'Errore');
+          }
+          location.reload();
+        } catch (err) {
+          alert('Errore: ' + err.message);
+        }
+      });
+    });
+
+    document.querySelectorAll('button[data-action="status"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const newStatus = btn.dataset.status;
+        try {
+          const res = await fetch(`/offers/${id}/status`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              ...(requiresToken ? { 'X-Admin-Token': currentToken() } : {}),
+            },
+            body: new URLSearchParams({ new_status: newStatus })
+          });
+          if (!res.ok) {
+            const detail = await res.json().catch(() => ({}));
+            throw new Error(detail.detail || 'Errore');
+          }
+          location.reload();
+        } catch (err) {
+          alert('Errore: ' + err.message);
+        }
+      });
+    });
+
+    offerForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      if (!currentId) return;
+      const formData = new FormData(offerForm);
+      formData.set('status_value', statusSelect.value);
+      formData.set('highlighted', highlightInput.checked ? 'true' : 'false');
+      try {
+        const res = await fetch(`/offers/${currentId}/update`, {
+          method: 'POST',
+          headers: { ...(requiresToken ? { 'X-Admin-Token': currentToken() } : {}) },
+          body: formData
+        });
+        if (!res.ok) {
+          const detail = await res.json().catch(() => ({}));
+          throw new Error(detail.detail || 'Errore');
+        }
+        closeModal();
+        location.reload();
+      } catch (err) {
+        alert('Errore: ' + err.message);
+      }
+    });
+
+    cancelBtn.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', (ev) => { if (ev.target === backdrop) closeModal(); });
+  </script>
+  <footer class="global-footer">
+    <div class="footer-inner">
+      <span>© 2025 LocalBrain Fiumicino. Tutti i diritti riservati.</span>
+      <nav>
+        <a href="/businesses/new">Aggiungi attività</a>
+        <a href="/offers/new">Pubblica annuncio</a>
+        <a href="https://t.me/localbrain_fiumicino_bot" target="_blank" rel="noopener noreferrer">Iscriviti al canale Telegram</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

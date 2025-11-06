@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalBrain · Bacheca Servizi</title>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6f8; margin: 0; }
+    header { background: #1c3faa; color: #fff; padding: 1.2rem 2rem 1.6rem; }
+    .topbar { display:flex; flex-wrap:wrap; align-items:center; gap:1.2rem; }
+    .topbar h1 { margin:0; font-size:1.85rem; flex:1 1 auto; }
+    nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    nav a { color:#fff; font-weight:600; text-decoration:none; padding:0.45rem 0.8rem; border-radius:999px; background:rgba(255,255,255,0.16); }
+    nav a:hover { background:rgba(255,255,255,0.28); }
+    main { padding: 1.5rem 2rem 3rem; max-width: 960px; margin: 0 auto; }
+    form.filters { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; align-items: flex-end; justify-content: center; }
+    form.filters label { display: flex; flex-direction: column; font-size: 0.9rem; color: #24305a; min-width: 200px; }
+    select, input[type="text"] { padding: 0.45rem 0.6rem; border: 1px solid #ccd4e0; border-radius: 6px; background: #fff; }
+    button { padding: 0.55rem 1.1rem; background: #1c3faa; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    button:hover { background: #162f7a; }
+    .grid { display: grid; gap: 1rem; }
+    article { background: #fff; border-radius: 12px; padding: 1.2rem 1.5rem; box-shadow: 0 10px 30px -22px rgba(31, 58, 215, 0.6); }
+    article h3 { margin: 0 0 0.4rem; font-size: 1.2rem; color: #111827; }
+    .meta { font-size: 0.85rem; color: #475569; margin-bottom: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+    .badge { background: #e0e7ff; color: #1e3a8a; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 600; font-size: 0.75rem; }
+    .contact { margin-top: 0.8rem; font-weight: 600; color: #1c3faa; }
+    .empty { background: #fff; border-radius: 12px; padding: 1.5rem; text-align: center; color: #6c7896; }
+    .notice { background: #ecfdf5; color: #047857; border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 1.5rem; border: 1px solid #bbf7d0; }
+    @media (max-width: 640px) {
+      form.filters label { width: 100%; }
+      select, input[type="text"], button { width: 100%; }
+    }
+    .global-footer { background:#1c3faa; color:#f8fafc; padding:1.4rem 2rem; margin-top:3rem; }
+    .global-footer .footer-inner { max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between; font-size:0.9rem; }
+    .global-footer nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    .global-footer nav a { color:#ffffff; text-decoration:none; font-weight:600; background:rgba(255,255,255,0.18); padding:0.4rem 0.75rem; border-radius:999px; }
+    .global-footer nav a:hover { background:rgba(255,255,255,0.28); }
+  </style>
+  <script src="/static/cookie-banner.js"></script>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <h1>Bacheca servizi & lavoro</h1>
+      <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/offers">Bacheca servizi</a>
+        <a href="/businesses">Attività locali</a>
+      </nav>
+    </div>
+    <p style="margin:.4rem 0 0; max-width:720px;">Autocandidature e servizi offerti dalla comunità locale (pulizie, babysitter, ripetizioni, assistenza…). Gli annunci vengono pubblicati dopo approvazione.</p>
+  </header>
+  <main>
+    {% if submitted %}
+      <div class="notice">Abbiamo ricevuto la tua richiesta. La pubblicheremo dopo una rapida verifica.</div>
+    {% endif %}
+    <form method="get" class="filters">
+      <label>
+        Città
+        <select name="city">
+          <option value="">Tutte</option>
+          {% for c in cities %}
+            <option value="{{ c }}" {% if c == selected_city %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Categoria
+        <select name="category">
+          <option value="tutte">Tutte</option>
+          {% for value, label in categories %}
+            <option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button type="submit">Filtra</button>
+    </form>
+
+    {% if offers %}
+      <div class="grid">
+        {% for offer in offers %}
+          <article>
+            <h3>{{ offer.title }}</h3>
+            <div class="meta">
+              <span class="badge">{{ offer.category_label }}</span>
+              <span>{{ offer.city }}{% if offer.zone %} · {{ offer.zone }}{% endif %}</span>
+              <span>Pubblicato il {{ offer.created_at[:10] if offer.created_at else "" }}</span>
+            </div>
+            <p>{{ offer.description }}</p>
+            {% if offer.available_range %}<p><strong>Disponibilità:</strong> {{ offer.available_range }}</p>{% endif %}
+            <div class="contact">Contatto: {{ offer.contact_name }} – {{ offer.contact_method }}{% if offer.rate %} · Tariffa indicativa: {{ offer.rate }}{% endif %}</div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty">Nessun annuncio disponibile. <a href="/offers/new">Inserisci il tuo</a>.</div>
+    {% endif %}
+  </main>
+  <footer class="global-footer">
+    <div class="footer-inner">
+      <span>© 2025 LocalBrain Fiumicino. Tutti i diritti riservati.</span>
+      <nav>
+        <a href="/businesses/new">Aggiungi attività</a>
+        <a href="/offers/new">Pubblica annuncio</a>
+        <a href="/ad-request">Richiedi pubblicità</a>
+        <a href="/about-us">Chi Siamo</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms-conditions">Termini</a>
+        <a href="/disclaimer">Disclaimer</a>
+        <a href="https://t.me/localbrain_fiumicino_bot" target="_blank" rel="noopener noreferrer">Telegram</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

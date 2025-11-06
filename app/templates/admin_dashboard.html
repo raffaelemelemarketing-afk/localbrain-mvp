@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalBrain · Admin Dashboard</title>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6f8; margin: 0; }
+    header { background: #1c3faa; color: #fff; padding: 1.2rem 2rem 1.6rem; }
+    .topbar { display:flex; flex-wrap:wrap; align-items:center; gap:1.2rem; }
+    .topbar h1 { margin:0; font-size:1.85rem; flex:1 1 auto; }
+    nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    nav a { color:#fff; font-weight:600; text-decoration:none; padding:0.45rem 0.8rem; border-radius:999px; background:rgba(255,255,255,0.16); }
+    nav a:hover { background:rgba(255,255,255,0.28); }
+    main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .dashboard-card { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 4px solid #1c3faa; }
+    .dashboard-card h2 { margin: 0 0 1rem 0; color: #1f2937; font-size: 1.3rem; }
+    .dashboard-card p { color: #6b7280; margin: 0 0 1.5rem 0; line-height: 1.5; }
+    .dashboard-card .stats { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+    .stat { text-align: center; flex: 1; }
+    .stat-number { font-size: 1.8rem; font-weight: bold; color: #1c3faa; display: block; }
+    .stat-label { font-size: 0.8rem; color: #6b7280; }
+    .btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .btn { padding: 0.6rem 1rem; background: #1c3faa; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; }
+    .btn:hover { background: #162f7a; }
+    .btn-secondary { background: #6b7280; }
+    .btn-secondary:hover { background: #4b5563; }
+    .global-footer { background:#1c3faa; color:#f8fafc; padding:1.4rem 2rem; margin-top:3rem; }
+    .global-footer .footer-inner { max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between; font-size:0.9rem; }
+    .global-footer nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    .global-footer nav a { color:#ffffff; text-decoration:none; font-weight:600; background:rgba(255,255,255,0.18); padding:0.4rem 0.75rem; border-radius:999px; }
+    .global-footer nav a:hover { background:rgba(255,255,255,0.28); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <h1>Admin Dashboard</h1>
+      <nav>
+        <a href="/dashboard">Dashboard Pubblica</a>
+        <a href="/">Home</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="dashboard-grid">
+      <!-- Gestione Pubblicità -->
+      <div class="dashboard-card">
+        <h2>📢 Gestione Pubblicità</h2>
+        <p>Gestisci gli annunci sponsorizzati e le richieste di pubblicità</p>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-number">{{ pending_ads_count }}</span>
+            <span class="stat-label">Richieste in attesa</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{{ active_ads_count }}</span>
+            <span class="stat-label">Ads attivi</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <a href="/admin/ad-requests?token={{ admin_token }}" class="btn">Richieste Pubblicità</a>
+          <a href="/admin/ads?token={{ admin_token }}" class="btn btn-secondary">Gestisci Ads</a>
+        </div>
+      </div>
+
+      <!-- Gestione Annunci Servizi -->
+      <div class="dashboard-card">
+        <h2>👥 Gestione Annunci</h2>
+        <p>Modera gli annunci di servizi pubblicati dagli utenti</p>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-number">{{ pending_offers_count }}</span>
+            <span class="stat-label">In attesa</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{{ published_offers_count }}</span>
+            <span class="stat-label">Pubblicati</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <a href="/admin/offers?token={{ admin_token }}" class="btn">Gestisci Annunci</a>
+        </div>
+      </div>
+
+      <!-- Gestione Attività Locali -->
+      <div class="dashboard-card">
+        <h2>🏢 Attività Locali</h2>
+        <p>Gestisci le attività commerciali e professionali locali</p>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-number">{{ businesses_count }}</span>
+            <span class="stat-label">Attività totali</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{{ highlighted_businesses_count }}</span>
+            <span class="stat-label">In evidenza</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <a href="/admin/businesses?token={{ admin_token }}" class="btn">Gestisci Attività</a>
+        </div>
+      </div>
+
+      <!-- Contenuti e Sistema -->
+      <div class="dashboard-card">
+        <h2>⚙️ Sistema</h2>
+        <p>Gestisci i contenuti e le operazioni di sistema</p>
+        <div class="btn-group">
+          <a href="/admin/ingest-now" class="btn">Aggiorna Feed</a>
+          <a href="/health" class="btn btn-secondary">Health Check</a>
+        </div>
+      </div>
+
+      <!-- Statistiche -->
+      <div class="dashboard-card">
+        <h2>📊 Statistiche</h2>
+        <p>Panoramica generale del sistema</p>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-number">{{ total_items_count }}</span>
+            <span class="stat-label">Contenuti</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{{ total_offers_count }}</span>
+            <span class="stat-label">Annunci</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <a href="/dashboard" class="btn btn-secondary">Vedi Dashboard</a>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="dashboard-card">
+        <h2>🚀 Azioni Rapide</h2>
+        <p>Accesso rapido alle funzioni più utilizzate</p>
+        <div class="btn-group">
+          <a href="/admin/ads?token={{ admin_token }}" class="btn">Nuovo Ad</a>
+          <a href="/admin/offers?token={{ admin_token }}" class="btn">Modera Annunci</a>
+          <a href="/admin/ad-requests?token={{ admin_token }}" class="btn">Richieste Pub</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="global-footer">
+    <div class="footer-inner">
+      <span>© 2025 LocalBrain Fiumicino. Tutti i diritti riservati.</span>
+      <nav>
+        <a href="/businesses/new">Aggiungi attività</a>
+        <a href="/offers/new">Pubblica annuncio</a>
+        <a href="/ad-request">Richiedi pubblicità</a>
+        <a href="/about-us">Chi Siamo</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms-conditions">Termini</a>
+        <a href="/disclaimer">Disclaimer</a>
+        <a href="https://t.me/localbrain_fiumicino_bot" target="_blank" rel="noopener noreferrer">Telegram</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

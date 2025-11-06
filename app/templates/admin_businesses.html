@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalBrain · Admin Attività</title>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#f4f6fb; margin:0; color:#111827; }
+    header { background:#111827; color:#fff; padding:1.4rem 2rem; }
+    header h1 { margin:0; font-size:1.6rem; }
+    header p { margin:.35rem 0 0; opacity:.85; }
+    main { max-width:1100px; margin:0 auto; padding:1.8rem 2rem 3rem; }
+    #tokenSection { margin-bottom:1.5rem; display:flex; gap:.7rem; align-items:flex-end; flex-wrap:wrap; }
+    #tokenSection input { width:260px; padding:.55rem .7rem; border:1px solid #cbd5f5; border-radius:6px; }
+    button { padding:.55rem 1rem; border-radius:6px; border:none; cursor:pointer; font-weight:600; }
+    button.primary { background:#2563eb; color:#fff; }
+    button.outline { background:transparent; color:#2563eb; border:1px solid #2563eb; }
+    table { width:100%; border-collapse:collapse; background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 22px 48px -32px rgba(30, 64, 175, 0.5); }
+    th, td { padding:.75rem .7rem; border-bottom:1px solid #e5e7eb; text-align:left; font-size:.95rem; vertical-align:top; }
+    th { background:#eef2ff; font-weight:600; color:#1f2937; }
+    tr:last-child td { border-bottom:none; }
+    .badge { display:inline-flex; padding:.25rem .6rem; border-radius:999px; background:#e0e7ff; color:#1e3a8a; font-size:.75rem; }
+    .actions button { margin-right:.35rem; }
+    .status-label { font-size:.8rem; color:#6b7280; }
+    #status { margin-bottom:1rem; font-size:.95rem; color:#1d4ed8; }
+    .empty { padding:1.2rem; text-align:center; color:#6b7280; }
+    /* modal */
+    .backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.55); display:none; align-items:center; justify-content:center; z-index:40; }
+    .backdrop.show { display:flex; }
+    .modal { background:#fff; width:min(520px, 90%); border-radius:14px; padding:1.5rem; box-shadow:0 18px 48px -28px rgba(15,23,42,.7); max-height:90vh; overflow:auto; }
+    .modal h2 { margin:0 0 1rem; font-size:1.25rem; }
+    .modal form { display:flex; flex-direction:column; gap:.9rem; }
+    .modal label { display:flex; flex-direction:column; font-size:.9rem; gap:.45rem; color:#1f2937; }
+    .modal input, .modal select, .modal textarea { padding:.55rem .7rem; border:1px solid #cbd5f5; border-radius:8px; font-size:.95rem; }
+    .modal textarea { min-height:110px; resize:vertical; }
+    .modal .actions { display:flex; gap:.6rem; justify-content:flex-end; margin-top:.6rem; }
+    .highlight-toggle { display:flex; align-items:center; gap:.45rem; font-size:.9rem; }
+    @media(max-width:780px){ table, thead, tbody, th, td, tr { display:block; } th { position:sticky; top:0; } tr { border-bottom:1px solid #e5e7eb; padding-bottom:1rem; } td { padding:.55rem 0; } .actions { margin-top:.6rem; } }
+    .global-footer { background:#1c3faa; color:#f8fafc; padding:1.4rem 2rem; margin-top:3rem; }
+    .global-footer .footer-inner { max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between; font-size:0.9rem; }
+    .global-footer nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    .global-footer nav a { color:#ffffff; text-decoration:none; font-weight:600; background:rgba(255,255,255,0.18); padding:0.4rem 0.75rem; border-radius:999px; }
+    .global-footer nav a:hover { background:rgba(255,255,255,0.28); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gestione attività locali</h1>
+    <p>Totale attività: <strong>{{ businesses|length }}</strong></p>
+  </header>
+  <main>
+    <section id="tokenSection">
+      <div>
+        <label for="adminToken" style="display:block;font-weight:600;color:#1f2937">Token amministratore</label>
+        <input id="adminToken" type="text" placeholder="X-Admin-Token">
+      </div>
+      <button id="saveToken" class="outline">Salva token</button>
+      <div id="status"></div>
+    </section>
+    <div class="table-wrapper">
+      {% if businesses %}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Attività</th>
+            <th>Categoria</th>
+            <th>Contatti</th>
+            <th>Link</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for biz in businesses %}
+          <tr data-id="{{ biz.id }}">
+            <td>#{{ biz.id }}</td>
+            <td>
+              <strong>{{ biz.name }}</strong><br>
+              <span class="status-label">{{ biz.address }} – {{ biz.city }}</span><br>
+              <small>{{ biz.description[:140] }}{% if biz.description|length > 140 %}…{% endif %}</small>
+            </td>
+            <td><span class="badge">{{ categories_map.get(biz.category, biz.category) }}</span>{% if biz.highlighted %}<br><span class="status-label">In evidenza</span>{% endif %}</td>
+            <td>
+              {{ biz.contact_name }}<br>
+              {{ biz.contact_phone }}<br>
+              {{ biz.contact_email }}
+            </td>
+            <td>
+              {% if biz.website %}<a href="{{ biz.website }}" target="_blank">Sito</a><br>{% endif %}
+              {% if biz.social_link %}<a href="{{ biz.social_link }}" target="_blank">Social</a>{% endif %}
+            </td>
+            <td class="actions">
+              <button class="primary" data-action="edit"
+                data-payload='{{ biz | tojson }}'>Modifica</button>
+              <button class="outline" data-action="delete" data-id="{{ biz.id }}">Elimina</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <div class="empty">Nessuna attività registrata</div>
+      {% endif %}
+    </div>
+  </main>
+
+  <div class="backdrop" id="editBackdrop">
+    <div class="modal">
+      <h2>Modifica attività</h2>
+      <form id="editForm">
+        <input type="hidden" name="current_id" id="currentId">
+        <label>Nome attività
+          <input name="name" id="bizName" required>
+        </label>
+        <label>Descrizione
+          <textarea name="description" id="bizDescription"></textarea>
+        </label>
+        <label>Categoria
+          <select name="category" id="bizCategory">
+            {% for value, label in categories %}
+              <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Indirizzo
+          <input name="address" id="bizAddress">
+        </label>
+        <label>Città
+          <input name="city" id="bizCity">
+        </label>
+        <label>Referente
+          <input name="contact_name" id="bizContactName">
+        </label>
+        <label>Telefono
+          <input name="contact_phone" id="bizPhone">
+        </label>
+        <label>Email
+          <input name="contact_email" id="bizEmail">
+        </label>
+        <label>Website
+          <input name="website" id="bizWebsite">
+        </label>
+        <label>Link social
+          <input name="social_link" id="bizSocial">
+        </label>
+        <label>URL immagine
+          <input name="image_url" id="bizImage">
+        </label>
+        <label class="highlight-toggle">
+          <input type="checkbox" name="highlighted" id="bizHighlight">
+          Mostra in evidenza
+        </label>
+        <div class="actions">
+          <button type="button" id="cancelEdit" class="outline">Annulla</button>
+          <button type="submit" class="primary">Salva modifiche</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const requiresToken = {{ 'true' if requires_token else 'false' }};
+    const tokenInput = document.getElementById('adminToken');
+    const tokenSection = document.getElementById('tokenSection');
+    const statusEl = document.getElementById('status');
+    const backdrop = document.getElementById('editBackdrop');
+    const editForm = document.getElementById('editForm');
+    const cancelBtn = document.getElementById('cancelEdit');
+    const highlightInput = document.getElementById('bizHighlight');
+    let currentId = null;
+
+    if (!requiresToken) {
+      tokenSection.style.display = 'none';
+    } else {
+      const stored = localStorage.getItem('localbrain_admin_token') || '{{ admin_token }}';
+      tokenInput.value = stored;
+      document.getElementById('saveToken').addEventListener('click', () => {
+        localStorage.setItem('localbrain_admin_token', tokenInput.value.trim());
+        statusEl.textContent = 'Token salvato';
+      });
+    }
+
+    function currentToken() {
+      return requiresToken ? (tokenInput.value.trim() || localStorage.getItem('localbrain_admin_token') || '') : '';
+    }
+
+    function openModal(data) {
+      currentId = data.id;
+      editForm.reset();
+      document.getElementById('currentId').value = data.id;
+      document.getElementById('bizName').value = data.name || '';
+      document.getElementById('bizDescription').value = data.description || '';
+      document.getElementById('bizCategory').value = data.category || 'servizi';
+      document.getElementById('bizAddress').value = data.address || '';
+      document.getElementById('bizCity').value = data.city || '';
+      document.getElementById('bizContactName').value = data.contact_name || '';
+      document.getElementById('bizPhone').value = data.contact_phone || '';
+      document.getElementById('bizEmail').value = data.contact_email || '';
+      document.getElementById('bizWebsite').value = data.website || '';
+      document.getElementById('bizSocial').value = data.social_link || '';
+      document.getElementById('bizImage').value = data.image_url || '';
+      highlightInput.checked = !!data.highlighted;
+      backdrop.classList.add('show');
+    }
+
+    function closeModal() {
+      backdrop.classList.remove('show');
+      currentId = null;
+    }
+
+    document.querySelectorAll('button[data-action="edit"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const data = JSON.parse(btn.dataset.payload || '{}');
+        openModal(data);
+      });
+    });
+
+    document.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        if (!confirm('Eliminare questa attività?')) return;
+        try {
+          const res = await fetch(`/businesses/${id}`, {
+            method: 'DELETE',
+            headers: { ...(requiresToken ? { 'X-Admin-Token': currentToken() } : {}) }
+          });
+          if (!res.ok) {
+            const detail = await res.json().catch(() => ({}));
+            throw new Error(detail.detail || 'Errore');
+          }
+          location.reload();
+        } catch (err) {
+          alert('Errore: ' + err.message);
+        }
+      });
+    });
+
+    editForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      if (!currentId) return;
+      const formData = new FormData(editForm);
+      if (!highlightInput.checked) {
+        formData.set('highlighted', 'false');
+      } else {
+        formData.set('highlighted', 'true');
+      }
+      try {
+        const res = await fetch(`/businesses/${currentId}/update`, {
+          method: 'POST',
+          headers: { ...(requiresToken ? { 'X-Admin-Token': currentToken() } : {}) },
+          body: formData
+        });
+        if (!res.ok) {
+          const detail = await res.json().catch(() => ({}));
+          throw new Error(detail.detail || 'Errore');
+        }
+        closeModal();
+        location.reload();
+      } catch (err) {
+        alert('Errore: ' + err.message);
+      }
+    });
+
+    cancelBtn.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', (ev) => {
+      if (ev.target === backdrop) closeModal();
+    });
+  </script>
+  <footer class="global-footer">
+    <div class="footer-inner">
+      <span>© 2025 LocalBrain Fiumicino. Tutti i diritti riservati.</span>
+      <nav>
+        <a href="/businesses/new">Aggiungi attività</a>
+        <a href="/offers/new">Pubblica annuncio</a>
+        <a href="https://t.me/localbrain_fiumicino_bot" target="_blank" rel="noopener noreferrer">Iscriviti al canale Telegram</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

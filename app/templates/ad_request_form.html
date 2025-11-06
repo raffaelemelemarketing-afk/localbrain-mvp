@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalBrain · Richiedi pubblicità</title>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6f8; margin: 0; }
+    header { background: #1c3faa; color: #fff; padding: 1.2rem 2rem 1.6rem; }
+    .topbar { display:flex; flex-wrap:wrap; align-items:center; gap:1.2rem; }
+    .topbar h1 { margin:0; font-size:1.85rem; flex:1 1 auto; }
+    nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    nav a { color:#fff; font-weight:600; text-decoration:none; padding:0.45rem 0.8rem; border-radius:999px; background:rgba(255,255,255,0.16); }
+    nav a:hover { background:rgba(255,255,255,0.28); }
+    main { max-width: 720px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+    form { background: #fff; padding: 1.6rem 1.8rem; border-radius: 14px; box-shadow: 0 16px 36px -32px rgba(28, 63, 170, 0.7); display: grid; gap: 1.1rem; }
+    label { font-weight: 600; color: #1f2937; }
+    input, select, textarea { width: 100%; padding: 0.55rem 0.7rem; border: 1px solid #cbd5f5; border-radius: 8px; background: #fff; font-size: 0.95rem; }
+    textarea { min-height: 140px; resize: vertical; }
+    small { color: #6b7280; font-size: 0.8rem; }
+    button { padding: 0.7rem 1rem; background: #1c3faa; border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; }
+    button:hover { background: #162f7a; }
+    .global-footer { background:#1c3faa; color:#f8fafc; padding:1.4rem 2rem; margin-top:3rem; }
+    .global-footer .footer-inner { max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between; font-size:0.9rem; }
+    .global-footer nav { display:flex; gap:1rem; flex-wrap:wrap; }
+    .global-footer nav a { color:#ffffff; text-decoration:none; font-weight:600; background:rgba(255,255,255,0.18); padding:0.4rem 0.75rem; border-radius:999px; }
+    .global-footer nav a:hover { background:rgba(255,255,255,0.28); }
+    .ad-options { display: grid; gap: 1rem; margin: 1rem 0; }
+    .ad-option {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ad-option:hover {
+      border-color: #1c3faa;
+      background: #f8faff;
+    }
+    .ad-option.selected {
+      border-color: #1c3faa;
+      background: #f0f4ff;
+    }
+    .ad-option h3 {
+      margin: 0 0 0.5rem 0;
+      color: #1f2937;
+    }
+    .ad-option .price {
+      font-weight: bold;
+      color: #1c3faa;
+      font-size: 1.1rem;
+    }
+    .ad-option .description {
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin: 0.5rem 0;
+    }
+    input[type="radio"] {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+  </style>
+  <script src="/static/cookie-banner.js"></script>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <h1>Richiedi pubblicità</h1>
+      <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/offers">Bacheca servizi</a>
+        <a href="/businesses">Attività locali</a>
+      </nav>
+    </div>
+    <p style="margin:.4rem 0 0; max-width:640px;">Promuovi la tua attività su LocalBrain Fiumicino. Scegli il tipo di pubblicità che preferisci e ti contatteremo per i dettagli.</p>
+  </header>
+  <main>
+    <form method="post" action="/ad-requests">
+      <div>
+        <label for="business_name">Nome attività / Azienda *</label>
+        <input id="business_name" name="business_name" maxlength="200" required placeholder="Es. Ristorante Bella Vista">
+      </div>
+
+      <div>
+        <label for="contact_person">Persona di riferimento *</label>
+        <input id="contact_person" name="contact_person" required placeholder="Es. Mario Rossi">
+      </div>
+
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <div style="flex:1 1 200px;">
+          <label for="email">Email *</label>
+          <input id="email" name="email" type="email" required placeholder="tu@email.com">
+        </div>
+        <div style="flex:1 1 200px;">
+          <label for="phone">Telefono</label>
+          <input id="phone" name="phone" placeholder="+39 123 456 7890">
+        </div>
+      </div>
+
+      <div>
+        <label>Tipo di pubblicità *</label>
+        <div class="ad-options">
+          <label class="ad-option" onclick="selectOption(this)">
+            <input type="radio" name="ad_type" value="feed" required>
+            <h3>Sponsor nel Feed</h3>
+            <div class="price">€ 50/mese</div>
+            <div class="description">Il tuo annuncio appare ogni 3-5 contenuti nel feed principale. Massima visibilità!</div>
+          </label>
+
+          <label class="ad-option" onclick="selectOption(this)">
+            <input type="radio" name="ad_type" value="sidebar">
+            <h3>Banner Laterale</h3>
+            <div class="price">€ 30/mese</div>
+            <div class="description">Banner fisso nella sidebar sinistra o destra. Visibilità costante.</div>
+          </label>
+
+          <label class="ad-option" onclick="selectOption(this)">
+            <input type="radio" name="ad_type" value="both">
+            <h3>Pacchetto Completo</h3>
+            <div class="price">€ 70/mese</div>
+            <div class="description">Sponsor nel feed + banner laterale. La soluzione più completa.</div>
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label for="message">Messaggio / Note aggiuntive</label>
+        <textarea id="message" name="message" placeholder="Raccontaci di più sulla tua attività e su cosa vorresti promuovere..."></textarea>
+      </div>
+
+      <div style="margin: 1.5rem 0;">
+        <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+          <input type="checkbox" name="privacy_accepted" required style="margin-top: 0.2rem;">
+          <span>Accetto la <a href="/privacy-policy" target="_blank" style="color: #1c3faa; text-decoration: underline;">Privacy Policy</a> e i <a href="/terms-conditions" target="_blank" style="color: #1c3faa; text-decoration: underline;">Termini & Condizioni</a> di LocalBrain *</span>
+        </label>
+      </div>
+
+      <button type="submit">Invia richiesta</button>
+      <small style="text-align: center; display: block;">Ti contatteremo entro 24 ore per confermare i dettagli e attivare la pubblicità.</small>
+    </form>
+  </main>
+
+  <footer class="global-footer">
+    <div class="footer-inner">
+      <span>© 2025 LocalBrain Fiumicino. Tutti i diritti riservati.</span>
+      <nav>
+        <a href="/businesses/new">Aggiungi attività</a>
+        <a href="/offers/new">Pubblica annuncio</a>
+        <a href="/ad-request">Richiedi pubblicità</a>
+        <a href="/about-us">Chi Siamo</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms-conditions">Termini</a>
+        <a href="/disclaimer">Disclaimer</a>
+        <a href="https://t.me/localbrain_fiumicino_bot" target="_blank" rel="noopener noreferrer">Telegram</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    function selectOption(element) {
+      // Deseleziona tutte le opzioni
+      document.querySelectorAll('.ad-option').forEach(opt => {
+        opt.classList.remove('selected');
+      });
+      // Seleziona l'opzione cliccata
+      element.classList.add('selected');
+      // Seleziona il radio button
+      const radio = element.querySelector('input[type="radio"]');
+      radio.checked = true;
+    }
+  </script>
+</body>
+</html>
