@@ -93,7 +93,7 @@ def list_items(
     every: int = Query(3, ge=1),
     db: Session = Depends(get_db)
 ):
-    q = db.query(Item).order_by(Item.score.desc(), Item.published_at.desc())
+    q = db.query(Item).order_by(Item.published_at.desc())
     if city:
         q = q.filter(Item.city.ilike(f"%{city}%"))
     if category:
@@ -108,7 +108,8 @@ def list_items(
         "city": i.city,
         "category": i.category,
         "published_at": i.published_at.isoformat() if i.published_at else None,
-        "score": i.score
+        "score": i.score,
+        "image_url": i.image_url
     } for i in q.limit(limit).all()]
 
     if not include_ads or not items:
@@ -150,7 +151,7 @@ def dashboard(
     limit: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db)
 ):
-    q = db.query(Item).order_by(Item.score.desc(), Item.published_at.desc())
+    q = db.query(Item).order_by(Item.published_at.desc())
     if city:
         q = q.filter(Item.city.ilike(f"%{city}%"))
     if category:
@@ -197,6 +198,7 @@ def dashboard(
                 "city": i.city,
                 "category": i.category,
                 "published_at": i.published_at.strftime("%d/%m/%Y %H:%M") if i.published_at else "",
+                "image_url": i.image_url,
             })
         else:
             ad = entry["record"]
