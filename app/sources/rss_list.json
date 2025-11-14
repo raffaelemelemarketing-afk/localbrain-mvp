@@ -23,5 +23,25 @@
     "name": "Turismo Roma – Eventi e Notizie",
     "url": "https://www.turismoroma.it/rss.xml",
     "city": "Roma"
+  },
+  {
+    "name": "Fiumicino Online",
+    "url": "https://www.fiumicino-online.it/feed",
+    "city": "Fiumicino"
+  },
+  {
+    "name": "Il Faro Online – Fiumicino",
+    "url": "https://cdn.ilfaroonline.it/notizie-di-citta/fiumicino/feed/",
+    "city": "Fiumicino"
+  },
+  {
+    "name": "QFiumicino",
+    "url": "https://www.qfiumicino.com/feed",
+    "city": "Fiumicino"
+  },
+  {
+    "name": "Fiumicinonews.it",
+    "url": "https://fiumicinonews.it/feed",
+    "city": "Fiumicino"
   }
 ]
