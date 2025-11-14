@@ -69,7 +69,8 @@ Modifica `app/sources/rss_list.json` e `app/sources/html_rules.json` per aggiung
 - `lavoro`, `bandi`, `eventi`, `annunci`, `casa`, `altro`
 
 ## Dashboard, Ads & Bacheca
-- `/dashboard` mostra il feed filtrabile con ads intercalati, due slot laterali sticky e una sezione "Professionisti disponibili" con le ultime autocandidature. Footer coerente con l’header (blu LocalBrain): shortcut “Aggiungi attività”, “Pubblica annuncio”, iscrizione Telegram. Le pagine admin mantengono stile uniforme.
+- `/dashboard` mostra il feed filtrabile con ads intercalati, due slot laterali sticky e una sezione "Professionisti disponibili" con le ultime autocandidature. Footer coerente con l'header (blu LocalBrain): shortcut "Aggiungi attività", "Pubblica annuncio", iscrizione Telegram. Le pagine admin mantengono stile uniforme.
+- **Ordinamento:** Gli articoli sono ordinati cronologicamente (più recenti per primi) per garantire contenuti freschi in testata.
 - La bacheca `/offers` elenca le autocandidature pubblicate; `/offers/new` è il form pubblico (gli annunci restano in `pending` finché non approvati).
 - Gli ads si configurano dal pannello `/admin/ads` (senza login). Gli annunci della bacheca si moderano da `/admin/offers`.
 - `/items?include_ads=true` restituisce gli item con sponsor (campo `type=item|ad`).
@@ -92,7 +93,7 @@ Modifica `app/sources/rss_list.json` e `app/sources/html_rules.json` per aggiung
 
 ## Nuove Funzionalità (Novembre 2025)
 
-### Estrazione Immagini da RSS
+### Estrazione Immagini da RSS (Completato ✅)
 - Estrae automaticamente immagini da feed RSS da 5 fonti diverse:
   - `media_content` (tag media:content)
   - `enclosures` (allegati RSS)
@@ -101,27 +102,37 @@ Modifica `app/sources/rss_list.json` e `app/sources/html_rules.json` per aggiung
   - `summary` (riassunto con immagini)
 - Immagini salvate come URL (hotlinking) senza occupare spazio locale
 - Visualizzazione immagini nella dashboard con stile responsivo
+- Database migration automatica per aggiunta campo `image_url`
 
-### Documentazione Legale e GDPR
+### Documentazione Legale e GDPR (Completato ✅)
 - Privacy Policy, Terms & Conditions, Disclaimer, About Us
 - Cookie banner GDPR compliant
 - Checkbox accettazione privacy in tutti i moduli
 - Footer con link legali su tutte le pagine
 
-### Git Repository
+### Git Repository (Completato ✅)
 - Repository GitHub privato configurato
 - Deployment automatizzato via SCP
 - Gestione versioni del codice
+- Guida Git completa sul desktop
+
+### Ordinamento Cronologico Dashboard (Completato ✅ - 14 Nov 2025)
+- Articoli ordinati per data di pubblicazione decrescente
+- Contenuti più recenti sempre in testata
+- Rimosso ordinamento per score per privilegiare la freschezza delle notizie
 
 ## Roadmap breve
 - [x] Scheduler (APScheduler) per ingest automatico ogni ora
 - [x] Estrazione immagini da RSS feeds (media_content, enclosures, media_thumbnail, content, summary)
 - [x] Visualizzazione immagini articoli nella dashboard
-- [ ] Filtri/alert per categoria
-- [x] Pannello admin upload ads
+- [x] Documentazione legale completa (Privacy, Terms, Disclaimer, About Us)
+- [x] Cookie banner GDPR compliant
+- [x] Footer ottimizzato con link legali e navigazione
+- [x] Repository Git configurato e deployment automatizzato
+- [x] Ordinamento cronologico dashboard (notizie più recenti per prime)
+- [ ] Funzionalità di ricerca nel feed
 - [ ] Metriche click-through / analytics
 - [ ] Export canale Telegram "broadcast" locale
-- [ ] Funzionalità di ricerca nel feed
 
 ---
 **Brand:** ainextstudio.it — Pilot: Fiumicino
